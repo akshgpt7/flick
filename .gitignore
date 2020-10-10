@@ -1,0 +1,24 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+### Dev Tools ###
+.idea/*
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pythonenv*
