@@ -7,6 +7,7 @@ name = "pypi"
 flask = "==1.1.2"
 click = "*"
 python-dotenv = "*"
+requests = "*"
 
 [dev-packages]
 
