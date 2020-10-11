@@ -28,6 +28,7 @@ def joints():
 
     return jsonify(joints_json)
 
+
 @bp.route('/joints/<int:joint_id>')
 def joint(joint_id):
     db = get_db()
@@ -47,6 +48,7 @@ def joint(joint_id):
                       }
 
     return jsonify(joint_json)
+
 
 @bp.route('/joints/<int:joint_id>/menu')
 def menu(joint_id):
@@ -71,27 +73,27 @@ def menu(joint_id):
 
     return jsonify(pizzas_json)
 
-@bp.route('/joints/<int:joint_id>/rate', methods=['GET','POST',])
+
+@bp.route('/joints/<int:joint_id>/rate', methods=['POST'])
 def rate(joint_id):
-    if request.method == 'POST':
+    # TODO: Change rating to user input from CLI
+    rating = 5
+    error = None
 
-        # TODO: Change rating to user input from CLI
-        rating = 5
-        error = None
+    # Checks that input is valid
+    if not (0 <= rating <= 5):
+        error = "Invalid rating."
 
-        # Checks that input is valid
-        if not (0 <= rating <= 5):
-            error = "Invalid rating."
-
-        if error is not None:
-            # TODO: Display the error to the user
-            return error
-        else:
-            db.execute(
-                'INSERT INTO ratings'
-                ' VALUES (?, ?)',
-                (joint_id, rating)
-            )
-            db.commit()
+    if error is not None:
+        # TODO: Display the error to the user
+        return error
+    else:
+        db.execute(
+            'INSERT INTO ratings'
+            ' VALUES (?, ?)',
+            (joint_id, rating)
+        )
+        db.commit()
 
     return redirect(url_for('joints.joint', joint_id=joint_id))
+
