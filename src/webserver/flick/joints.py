@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, request, jsonify
+    Blueprint, request, redirect, url_for, jsonify
 )
 from werkzeug.exceptions import abort
 from .db import get_db
@@ -7,7 +7,7 @@ from .db import get_db
 bp = Blueprint('joints', __name__)
 
 @bp.route('/joints')
-def get_joints():
+def joints():
     db = get_db()
     joints = db.execute(
         'SELECT joint_id, name, location, description FROM joints'
@@ -19,10 +19,12 @@ def get_joints():
     return jsonify(joints)
 
 @bp.route('/joints/<int:joint_id>')
-def get_joint(joint_id):
+def joint(joint_id):
     db = get_db()
     joint = db.execute(
-        'SELECT joint_id, name, location, description FROM joints WHERE joint_id = ?',
+        'SELECT j.joint_id, name, location, description, AVG(r.rating) '
+        ' FROM joints j JOIN ratings r ON j.joint_id = r.joint_id'
+        ' WHERE j.joint_id = ?',
         (joint_id,)
     ).fetchone()
 
@@ -32,7 +34,7 @@ def get_joint(joint_id):
     return jsonify(joint)
 
 @bp.route('/joints/<int:joint_id>/menu')
-def get_menu(joint_id):
+def menu(joint_id):
     db = get_db()
     pizzas = db.execute(
         'SELECT pizza_id, name, toppings, vegetarian FROM pizzas WHERE joint_id = ?',
@@ -44,24 +46,28 @@ def get_menu(joint_id):
 
     return jsonify(pizzas)
 
-@bp.route('/joints/<int:joint_id>/rate', methods=('GET', 'POST'))
-def create():
+@bp.route('/joints/<int:joint_id>/rate', methods=['GET','POST',])
+def rate(joint_id):
     if request.method == 'POST':
 
-        rating = 5;
+        # TODO: Change rating to user input from CLI
+        rating = 5
         error = None
 
-        if not (rating >= 0 and rating <= 5):
-            error = 'Rating is invalid'
-            abort(404, "No pizzas found for this joint.")
+        # Checks that input is valid
+        if not (0 <= rating <= 5):
+            error = "Invalid rating."
+
+        if error is not None:
+            # TODO: Display the error to the user
+            return error
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                'INSERT INTO ratings'
+                ' VALUES (?, ?)',
+                (joint_id, rating)
             )
             db.commit()
-            return redirect(url_for('blog.index'))
 
-    return render_template('blog/create.html')
+    return redirect(url_for('joints.joint', joint_id=joint_id))
