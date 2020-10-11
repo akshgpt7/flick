@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, jsonify
+    Blueprint, request, jsonify
 )
 from werkzeug.exceptions import abort
 from .db import get_db
@@ -43,3 +43,25 @@ def get_menu(joint_id):
         abort(404, "No pizzas found for this joint.")
 
     return jsonify(pizzas)
+
+@bp.route('/joints/<int:joint_id>/rate', methods=('GET', 'POST'))
+def create():
+    if request.method == 'POST':
+
+        rating = 5;
+        error = None
+
+        if not (rating >= 0 and rating <= 5):
+            error = 'Rating is invalid'
+            abort(404, "No pizzas found for this joint.")
+        else:
+            db = get_db()
+            db.execute(
+                'INSERT INTO post (title, body, author_id)'
+                ' VALUES (?, ?, ?)',
+                (title, body, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('blog.index'))
+
+    return render_template('blog/create.html')
