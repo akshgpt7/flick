@@ -18,7 +18,7 @@ def get_joints():
 
     return jsonify(joints)
 
-@bp.route('/joints/<int:id>')
+@bp.route('/joints/<int:joint_id>')
 def get_joint(joint_id):
     db = get_db()
     joint = db.execute(
@@ -30,3 +30,16 @@ def get_joint(joint_id):
         abort(404, "Joint id {0} doesn't exist.".format(joint_id))
 
     return jsonify(joint)
+
+@bp.route('/joints/<int:joint_id>/menu')
+def get_menu(joint_id):
+    db = get_db()
+    pizzas = db.execute(
+        'SELECT pizza_id, name, toppings, vegetarian FROM pizzas WHERE joint_id = ?',
+        (joint_id,)
+    ).fetchall()
+
+    if not pizzas:
+        abort(404, "No pizzas found for this joint.")
+
+    return jsonify(pizzas)
