@@ -29,6 +29,20 @@ def joints():
     return jsonify(joints_json)
 
 
+@bp.route('/joints/ratings')
+def ratings():
+    db = get_db()
+    ratings = db.execute(
+        'SELECT joint_id, AVG(rating) FROM ratings GROUP BY joint_id'
+    ).fetchall()
+
+    ratings_json = []
+    for r in ratings:
+        ratings_json.append({'joint_id': r[0], 'rating': r[1]})
+
+    return jsonify(ratings_json)
+
+
 @bp.route('/joints/<int:joint_id>')
 def joint(joint_id):
     db = get_db()
