@@ -226,10 +226,37 @@ def rate(joint_id, rating, review, name='rate'):
                 click.echo('Review submitted - Thanks for your feedback!')
             else:
                 click.echo('Uh-oh! Something went wrong, please try again.')
+
+
+@click.command()
+@click.option('--veggie', is_flag=True, help='Filter for vegetarian options')
+@click.argument('joint_id', type=int)
+def show_menu(joint_id, veggie, name='show-menu'):
+    """Show menu items for joint specified"""
+    response = requests.get(server_url + f"/joints/{joint_id}/menu")
+    table = Texttable()
+    headings = [['Name', 'Toppings']]
+
+    # Will be true when the user passes a pizza joint ID that doesn't exist
+    if response.status_code == 404:
+        print("The pizza joint id that you passed doesn't exist")
+        exit(1)
+
+    response_list = response.json()
+    table_rows = []
+    for res in response_list:
+        if veggie:
+            if res['vegetarian']:
+                table_rows.append([res['name'], res['toppings']])
+        else:
+            table_rows.append([res['name'], res['toppings']])
+
+    table.add_rows(headings + table_rows)
+    click.echo('\n' + table.draw())
                                     
 
 cli.add_command(order)
 cli.add_command(show_joints)
 cli.add_command(joint_info)
 cli.add_command(rate)
-cli.add_command(order)
+cli.add_command(show_menu)
