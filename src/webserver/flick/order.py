@@ -21,8 +21,8 @@ def order():
             abort(406, message)
 
         joint_order_queue = queues.get(joint_id)
-        joint_order_queue.append(order_details)
-        
+        joint_order_queue.append(order_details['details'])
+
         return jsonify({'order_status': f'{message}'})
 
     else:

@@ -1,6 +1,7 @@
 import random
 import click
 import requests
+import json
 from texttable import Texttable
 
 
@@ -69,6 +70,92 @@ def show_joints(location, min_rating, name='show-joints'):
 
 
 @click.command()
+@click.argument('joint', type=int)
+@click.argument('item', type=int)
+def order(joint, item, name='order'):
+
+    try:
+
+        pizza_name = ''
+        joint_name = ''
+        price = ''
+
+        size = click.prompt("What size do you want? Enter S, M or L", type=str)
+        while not (size == 'S') and not (size == 'M') and not (size == 'L'):
+            size = click.prompt("Invalid selection! Enter S, M or L", type=str)
+
+        joints_response = requests.get(server_url + "/joints")
+        joints_json = joints_response.json()
+        for j in joints_json:
+            if int(j['joint_id']) == joint:
+                joint_name = j['name']
+
+        menu = requests.get(server_url + "/joints/" + str(joint) + "/menu")
+        menu_json = menu.json()
+        for i in menu_json:
+            if int(i['pizza_id']) == item:
+                pizza_name = i['name']
+                for p in i['prices']:
+                    price = p[size]
+
+        if pizza_name and joint_name and price:
+            click.echo('\nYou selected ' + pizza_name + ' (size ' + size + ' for $' + str(price) + ') from ' + joint_name)
+
+        order_details = {
+            'item_id': item,
+            'size': size,
+        }
+
+        # If user chooses to custom order their pizza
+        if item == 0:
+
+            click.echo('Create your own pizza! Enter your preferences below: ')
+
+            # Ask for toppings etc.
+            toppings = click.prompt('Choose your toppings: ', type=str)
+            sauce = click.prompt('Choose your sauce', type=str)
+            crust = click.prompt('Choose your crust (thin/thick)', type=str)
+
+            order_details['custom'] = {
+                'toppings': toppings,
+                'sauce': sauce,
+                'crust': crust
+            }
+
+        # Ask for user details
+        click.echo('\nTell us a bit about yourself!')
+        name = click.prompt('Name', type=str)
+        address = click.prompt('Address', type=str)
+        phone = click.prompt('Phone number', type=str)
+
+        user_info = {
+            'name': name,
+            'address': address,
+            'phone': phone
+        }
+
+        order_json = {}
+        order_json['joint_id'] = joint
+        order_json['details'] = {'user_info': user_info, 'order_details': order_details}
+
+        confirm = click.prompt("\nDo you want to place your order? Enter Y or N", type=str)
+
+        if confirm == 'Y':
+            response = requests.post(server_url + "/order", json.dumps(order_json))
+            if response.ok:
+                click.echo('Thank you for your order!')
+            else:
+                click.echo('Uh-oh, something went wrong! Please try again.')
+        else:
+            click.echo("Order cancelled")
+            
+    except IndexError:
+        click.echo(click.style('INVALID ORDER',
+                               bg='red', fg='white')
+                   )
+
+            
+@click.command()
 @click.option('--reviews', is_flag=True)
 @click.argument('joint_id')
 def joint_info(joint_id, reviews, name='joint-info'):
@@ -105,7 +192,6 @@ def joint_info(joint_id, reviews, name='joint-info'):
                 click.echo("\t~  " + review_list[i])
 
 
-
 @click.command()
 @click.option('--review', type=str)
 @click.argument('joint_id')
@@ -130,8 +216,9 @@ def rate(joint_id, rating, review, name='rate'):
                 rating_json['review'] = None
             request = requests.post(server_url + f"/joints/{joint_id}/rate",
                                     json=rating_json)
-
+                                    
 
 cli.add_command(show_joints)
 cli.add_command(joint_info)
 cli.add_command(rate)
+cli.add_command(order)
