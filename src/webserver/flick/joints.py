@@ -68,7 +68,9 @@ def joint(joint_id):
 def menu(joint_id):
     db = get_db()
     pizzas = db.execute(
-        'SELECT pizza_id, name, toppings, vegetarian FROM pizzas WHERE joint_id = ?',
+        'SELECT m.pizza_id, name, toppings, vegetarian, p.small, p.medium, p.large'
+        ' FROM pizzas m JOIN prices p ON m.pizza_id = p.pizza_id'
+        ' WHERE m.joint_id = ?',
         (joint_id,)
     ).fetchall()
 
@@ -77,11 +79,14 @@ def menu(joint_id):
     else:
         pizzas_json = []
         for p in pizzas:
+            prices = []
+            prices.append(
+                {'S': p[4], 'M': p[5], 'L': p[6]}
+            )
             pizzas_json.append(
-                # TODO: add pizza price
                 {
                     'pizza_id': p[0], 'name': p[1], 'toppings': p[2],
-                    'vegetarian': bool(p[3])
+                    'vegetarian': bool(p[3]), 'prices': prices
                 }
             )
 
