@@ -156,7 +156,7 @@ def rate(joint_id):
                 (joint_id, review)
             )
             db.commit()
-        return(redirect('joints'))
+        return jsonify({"status": "success"})
 
     else:
         abort(404, "Joint id {0} doesn't exist.".format(joint_id))
