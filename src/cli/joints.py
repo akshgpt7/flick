@@ -151,18 +151,11 @@ def show_menu(joint_id, veggie):
         if veggie:
             if res['vegetarian']:
                 table_rows.append([res['name'], res['toppings']])
-                print(res)
-                print(res['name'])
-                print(res['toppings'])
         else:
             table_rows.append([res['name'], res['toppings']])
-            print(res)
-            print(res['name'])
-            print(res['toppings'])
 
-
+    table.add_rows(headings + table_rows)
     click.echo('\n' + table.draw())
-
 
 
 cli.add_command(show_joints)
