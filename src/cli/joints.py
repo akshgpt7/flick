@@ -13,9 +13,11 @@ def cli():
 
 
 @click.command()
-@click.option('-l', '--location', type=str)
-@click.option('-r', '--min-rating', type=float)
+@click.option('-l', '--location', type=str, help='Filter pizza joints by location')
+@click.option('-r', '--min-rating', type=float, help='Filter pizza joints by minimum rating')
 def show_joints(location, min_rating, name='show-joints'):
+    """View all available pizza joints"""
+
     table = Texttable()
     items = []
     headings = [['Joint', 'id']]
@@ -73,6 +75,7 @@ def show_joints(location, min_rating, name='show-joints'):
 @click.argument('joint', type=int)
 @click.argument('item', type=int)
 def order(joint, item, name='order'):
+    """Place your order for pizza :)"""
 
     try:
 
@@ -156,9 +159,11 @@ def order(joint, item, name='order'):
 
             
 @click.command()
-@click.option('--reviews', is_flag=True)
+@click.option('--reviews', is_flag=True, help='Display reviews')
 @click.argument('joint_id')
 def joint_info(joint_id, reviews, name='joint-info'):
+    """View information about a specific pizza joint"""
+
     response = requests.get(server_url + f"/joints/{joint_id}")
     if response.status_code == 404:
         click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
@@ -197,6 +202,7 @@ def joint_info(joint_id, reviews, name='joint-info'):
 @click.argument('joint_id')
 @click.argument('rating')
 def rate(joint_id, rating, review, name='rate'):
+    """Send a review for a pizza joint!"""
     response = requests.get(server_url + f"/joints/{joint_id}")
     if response.status_code == 404:
         click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
