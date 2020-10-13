@@ -57,5 +57,11 @@ Now you can order a Pizza on the fly, directly through your command line using `
 
 ## :zap: Usage
 Type `flick --help` to see a help message, and a list of commands you can use.
+***Type `flick [command-name] --help` to see help for a particular command.***
 
 #### Commands:
+- `joint-info`   View information about a specific pizza joint
+- `order`        Place your order for pizza :)
+- `rate`         Send a review for a pizza joint!
+- `show-joints`  View all available pizza joints
+- `show-menu`    Show menu items for joint specified
