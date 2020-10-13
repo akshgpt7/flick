@@ -56,7 +56,7 @@ Now you can order a Pizza on the fly, directly through your command line using `
 - Use any `flick` [command](#commands) now!
 
 ## :zap: Usage
-Type `flick --help` to see a help message, and a list of commands you can use.
+Type `flick --help` to see a help message, and a list of commands you can use.<br>
 ***Type `flick [command-name] --help` to see help for a particular command.***
 
 #### Commands:
