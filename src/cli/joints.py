@@ -76,7 +76,7 @@ def order(joint, item, size, name='order'):
 
     try:
 
-        order_details = []
+        order_details = {}
         pizza_name = ""
         joint_name = ""
 
@@ -104,39 +104,29 @@ def order(joint, item, size, name='order'):
             sauce = click.prompt('Choose a sauce: ', type=str)
             crust = click.prompt('Choose a crust: ', type=str)
 
-            order_details.append(
-                {
-                    'item_id': item,
-                    'size': size,
-                    'toppings': toppings,
-                    'sauce': sauce,
-                    'crust': crust
-                }
-            )
+            order_details = {
+                'item_id': item,
+                'size': size,
+                'toppings': toppings,
+                'sauce': sauce,
+                'crust': crust
+            }
 
         # Ask for user details
         click.echo('\nTell us a bit about yourself!')
-        name = click.prompt('Name', type=str)
-        address = click.prompt('Address', type=str)
-        phone = click.prompt('Phone number', type=str)
+        name = click.prompt('Name: ', type=str)
+        address = click.prompt('Address: ', type=str)
+        phone = click.prompt('Phone number: ', type=str)
 
-        user_info = []
-        user_info.append(
-            {
-                'name': name,
-                'address': address,
-                'phone': phone
-            }
-        )
+        user_info = {
+            'name': name,
+            'address': address,
+            'phone': phone
+        }
 
-        order_json = []
-        order_json.append(
-            {
-                'joint_id': joint,
-                'user_info': user_info,
-                'order_details': order_details
-            }
-        )
+        order_json = {}
+        order_json['joint_id'] = joint
+        order_json['details'] = {'user_info': user_info, 'order_details': order_details}
 
         confirm = click.prompt("\nDo you want to place your order? Enter Y or N", type=str)
         if confirm == 'Y':
