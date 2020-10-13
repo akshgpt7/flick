@@ -12,6 +12,7 @@
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*.pyc
 
 # Environments
 .env
