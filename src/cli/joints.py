@@ -3,8 +3,8 @@ import click
 import requests
 from texttable import Texttable
 
-
 server_url = "http://127.0.0.1:5000"
+
 
 @click.group()
 def cli():
@@ -32,7 +32,7 @@ def show_joints(location, min_rating, name='show-joints'):
             for detail in response_json:
                 if detail['location'].lower() == location.lower():
                     items.append([detail['name'], str(detail['joint_id'])])
-        
+
         if min_rating:
             allowed_ids = []
             ratings_response = requests.get(server_url + "/joints/ratings")
@@ -58,8 +58,8 @@ def show_joints(location, min_rating, name='show-joints'):
             click.echo('\nUse command: `joint-info [id]` for info on a joint.')
         else:
             click.echo(click.style('NO AVAILABLE JOINTS FOR YOUR SEARCH',
-                                bg='red', fg='white')
-                    )
+                                   bg='red', fg='white')
+                       )
 
 
     except IndexError:
@@ -105,7 +105,6 @@ def joint_info(joint_id, reviews, name='joint-info'):
                 click.echo("\t~  " + review_list[i])
 
 
-
 @click.command()
 @click.option('--review', type=str)
 @click.argument('joint_id')
@@ -121,7 +120,7 @@ def rate(joint_id, rating, review, name='rate'):
             click.echo(click.style(
                 f'Invalid Rating. Please choose a number between 0-5.',
                 fg='red')
-                       )
+            )
         else:
             rating_json = {'joint_id': joint_id, 'rating': rating}
             if review:
@@ -132,11 +131,12 @@ def rate(joint_id, rating, review, name='rate'):
                                     json=rating_json)
 
 
-
 @click.command()
-# @click.option('--veg', default=False, help='Order a vegetarian pizza')
-def show_menu(name='show-menu'):
+@click.option('--veggie', is_flag=True, help='Order a vegetarian pizza')
+@click.argument('joint_id', type=int)
+def show_menu(joint_id, veggie):
     print("Hello World! From inside show_menu!")
+    print("This is the joint_id: {} and veggie option: {}".format(joint_id, veggie))
 
 
 cli.add_command(show_joints)
