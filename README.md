@@ -14,6 +14,8 @@
   - [Technologies Used](#technologies-used)
   - [Team](#team)
 - [Development Setup](#electric_plug-development-setup)
+  - [Running the webserver](#running-the-webserver)
+  - [Setting up/Installing the CLI client](#setting-upinstalling-the-cli-client)
 - [Usage](#zap-usage)
   - [Commands](#commands)
 
