@@ -114,8 +114,24 @@ def order(joint, item, size, name='order'):
     try:
 
         order_details = []
+        pizza_name = ""
+        joint_name = ""
 
-        # If user choose to custom order their pizza
+        joints_response = requests.get(server_url + "/joints")
+        joints_json = joints_response.json()
+        for j in joints_json:
+            if int(j['joint_id']) == joint:
+                joint_name = j['name']
+
+        menu = requests.get(server_url + "/joints/" + str(joint) + "/menu")
+        menu_json = menu.json()
+        for i in menu_json:
+            if int(i['pizza_id']) == item:
+                pizza_name = i['name']
+
+        click.echo('\nYou selected ' + pizza_name + ' (' + size + ') from ' + joint_name)
+
+        # TODO: If user choose to custom order their pizza
         if item == 0:
 
             click.echo('Create your own pizza! Enter your preferences below: ')
@@ -134,8 +150,6 @@ def order(joint, item, size, name='order'):
                     'crust': crust
                 }
             )
-
-        click.echo('\nYou selected item ' + item + ' (' + size + ') from joint ' + joint)
 
         # Ask for user details
         click.echo('\nTell us a bit about yourself!')
