@@ -137,6 +137,12 @@ def rate(joint_id, rating, review, name='rate'):
 @click.argument('joint_id', type=int)
 def show_menu(joint_id, veggie):
     response = requests.get(server_url + f"/joints/{joint_id}/menu")
+
+    # Will be true when the user passes a pizza joint ID that doesn't exist
+    if response.status_code == 404:
+        print("The pizza joint id that you passed doesn't exist")
+        exit(1)
+
     response_list = response.json()
     for res in response_list:
         if veggie:
