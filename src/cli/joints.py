@@ -1,6 +1,7 @@
 import random
 import click
 import requests
+import json
 from texttable import Texttable
 
 server_url = "http://127.0.0.1:5000"
@@ -137,6 +138,15 @@ def rate(joint_id, rating, review, name='rate'):
 def show_menu(joint_id, veggie):
     print("Hello World! From inside show_menu!")
     print("This is the joint_id: {} and veggie option: {}".format(joint_id, veggie))
+    response = requests.get(server_url + f"/joints/{joint_id}/menu")
+    response_list = response.json()
+    for res in response_list:
+        if veggie:
+            if res['vegetarian']:
+                print(res)
+        else:
+            print(res)
+
 
 
 cli.add_command(show_joints)
