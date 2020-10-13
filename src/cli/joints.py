@@ -1,5 +1,6 @@
 import click
 import requests
+import json
 from texttable import Texttable
 
 
@@ -67,10 +68,75 @@ def show_joints(location, min_rating, name='show-joints'):
                    )
 
 
+@click.command()
+@click.argument('joint')
+@click.argument('item')
+@click.argument('size')
+def order(joint, item, size, name='order'):
+
+    try:
+
+        order_details = []
+
+        # If user choose to custom order their pizza
+        if item == 0:
+
+            click.echo('Create your own pizza! Enter your preferences below: ')
+
+            # Ask for toppings etc.
+            toppings = click.prompt('Choose toppings: ', type=str)
+            sauce = click.prompt('Choose a sauce: ', type=str)
+            crust = click.prompt('Choose a crust: ', type=str)
+
+            order_details.append(
+                {
+                    'item_id': item,
+                    'size': size,
+                    'toppings': toppings,
+                    'sauce': sauce,
+                    'crust': crust
+                }
+            )
+
+        click.echo('\nYou selected item ' + item + ' (' + size + ') from joint ' + joint)
+
+        # Ask for user details
+        click.echo('\nTell us a bit about yourself!')
+        name = click.prompt('Name', type=str)
+        address = click.prompt('Address', type=str)
+        phone = click.prompt('Phone number', type=str)
+
+        user_info = []
+        user_info.append(
+            {
+                'name': name,
+                'address': address,
+                'phone': phone
+            }
+        )
+
+        order_json = []
+        order_json.append(
+            {
+                'joint_id': joint,
+                'user_info': user_info,
+                'order_details': order_details
+            }
+        )
+
+        confirm = click.prompt("\nDo you want to place your order? Enter Y or N", type=str)
+        if confirm == 'Y':
+            response = requests.post(server_url + "/order", json.dumps(order_json))
+            # TODO: Format response using returned JSON
+            click.echo(response)
+        else:
+            click.echo("Order cancelled")
+
+    except IndexError:
+        click.echo(click.style('INVALID ORDER',
+                               bg='red', fg='white')
+                   )
 
 
-
-
-
-
+cli.add_command(order)
 cli.add_command(show_joints)
