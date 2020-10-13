@@ -106,11 +106,14 @@ def menu(joint_id):
 
         pizzas_json = []
         for p in pizzas:
+            prices = []
+            prices.append(
+                {'S': p[4], 'M': p[5], 'L': p[6]}
+            )
             pizzas_json.append(
-                # TODO: add pizza price
                 {
                     'pizza_id': p[0], 'name': p[1], 'toppings': p[2],
-                    'vegetarian': bool(p[3])
+                    'vegetarian': bool(p[3]), 'prices': prices
                 }
             )
 

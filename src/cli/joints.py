@@ -113,9 +113,13 @@ def order(joint, item, size, name='order'):
 
     try:
 
-        order_details = {}
-        pizza_name = ""
-        joint_name = ""
+        pizza_name = ''
+        joint_name = ''
+        price = ''
+
+        size = click.prompt("What size do you want? Enter S, M or L", type=str)
+        while not (size == 'S') and not (size == 'M') and not (size == 'L'):
+            size = click.prompt("Invalid selection! Enter S, M or L", type=str)
 
         joints_response = requests.get(server_url + "/joints")
         joints_json = joints_response.json()
@@ -128,22 +132,28 @@ def order(joint, item, size, name='order'):
         for i in menu_json:
             if int(i['pizza_id']) == item:
                 pizza_name = i['name']
+                for p in i['prices']:
+                    price = p[size]
 
-        click.echo('\nYou selected ' + pizza_name + ' (' + size + ') from ' + joint_name)
+        if pizza_name and joint_name and price:
+            click.echo('\nYou selected ' + pizza_name + ' (size ' + size + ' for $' + str(price) + ') from ' + joint_name)
 
-        # TODO: If user choose to custom order their pizza
+        order_details = {
+            'item_id': item,
+            'size': size,
+        }
+
+        # If user chooses to custom order their pizza
         if item == 0:
 
             click.echo('Create your own pizza! Enter your preferences below: ')
 
             # Ask for toppings etc.
-            toppings = click.prompt('Choose toppings: ', type=str)
-            sauce = click.prompt('Choose a sauce: ', type=str)
-            crust = click.prompt('Choose a crust: ', type=str)
+            toppings = click.prompt('Choose your toppings: ', type=str)
+            sauce = click.prompt('Choose your sauce', type=str)
+            crust = click.prompt('Choose your crust (thin/thick)', type=str)
 
-            order_details = {
-                'item_id': item,
-                'size': size,
+            order_details['custom'] = {
                 'toppings': toppings,
                 'sauce': sauce,
                 'crust': crust
@@ -151,9 +161,9 @@ def order(joint, item, size, name='order'):
 
         # Ask for user details
         click.echo('\nTell us a bit about yourself!')
-        name = click.prompt('Name: ', type=str)
-        address = click.prompt('Address: ', type=str)
-        phone = click.prompt('Phone number: ', type=str)
+        name = click.prompt('Name', type=str)
+        address = click.prompt('Address', type=str)
+        phone = click.prompt('Phone number', type=str)
 
         user_info = {
             'name': name,
@@ -166,10 +176,13 @@ def order(joint, item, size, name='order'):
         order_json['details'] = {'user_info': user_info, 'order_details': order_details}
 
         confirm = click.prompt("\nDo you want to place your order? Enter Y or N", type=str)
+
         if confirm == 'Y':
             response = requests.post(server_url + "/order", json.dumps(order_json))
-            # TODO: Format response using returned JSON
-            click.echo(response)
+            if response.ok:
+                click.echo('Thank you for your order!')
+            else:
+                click.echo('Uh-oh, something went wrong! Please try again.')
         else:
             click.echo("Order cancelled")
 
