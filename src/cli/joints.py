@@ -1,3 +1,4 @@
+import random
 import click
 import requests
 import json
@@ -147,12 +148,77 @@ def order(joint, item, name='order'):
                 click.echo('Uh-oh, something went wrong! Please try again.')
         else:
             click.echo("Order cancelled")
-
+            
     except IndexError:
         click.echo(click.style('INVALID ORDER',
                                bg='red', fg='white')
                    )
 
+            
+@click.command()
+@click.option('--reviews', is_flag=True)
+@click.argument('joint_id')
+def joint_info(joint_id, reviews, name='joint-info'):
+    response = requests.get(server_url + f"/joints/{joint_id}")
+    if response.status_code == 404:
+        click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
+                               bg='red', fg='white')
+                   )
+    else:
+        response_json = response.json()
 
-cli.add_command(order)
+        info = f"""
+        {response_json['name']} (id: {joint_id})
+        {response_json['description']}
+        Location: {response_json['location']}
+        Rating: {round(response_json['rating'], 1)}
+        """
+
+        click.echo(info)
+
+        if reviews:
+            click.echo("\t3 Random Reviews:")
+            response = requests.get(
+                server_url + f"/joints/{joint_id}/reviews")
+            review_list = response.json()
+
+            try:
+                review_numbers = random.sample(range(0, len(review_list)), 3)
+            except ValueError:
+                click.echo(f"\tOnly {len(review_list)} reviews for this joint.")
+                review_numbers = [n for n in range(len(review_list))]
+
+            for i in review_numbers:
+                click.echo("\t~  " + review_list[i])
+
+
+@click.command()
+@click.option('--review', type=str)
+@click.argument('joint_id')
+@click.argument('rating')
+def rate(joint_id, rating, review, name='rate'):
+    response = requests.get(server_url + f"/joints/{joint_id}")
+    if response.status_code == 404:
+        click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
+                               bg='red', fg='white')
+                   )
+    else:
+        if int(rating) < 0 or int(rating) > 5:
+            click.echo(click.style(
+                f'Invalid Rating. Please choose a number between 0-5.',
+                fg='red')
+                       )
+        else:
+            rating_json = {'joint_id': joint_id, 'rating': rating}
+            if review:
+                rating_json['review'] = review
+            else:
+                rating_json['review'] = None
+            request = requests.post(server_url + f"/joints/{joint_id}/rate",
+                                    json=rating_json)
+                                    
+
 cli.add_command(show_joints)
+cli.add_command(joint_info)
+cli.add_command(rate)
+cli.add_command(order)

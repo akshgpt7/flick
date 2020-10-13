@@ -7,6 +7,7 @@ setup(
     py_modules=['joints'],
     install_requires=[
         'Click',
+        'texttable',
     ],
     entry_points='''
         [console_scripts]
