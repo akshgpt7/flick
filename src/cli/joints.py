@@ -132,6 +132,14 @@ def rate(joint_id, rating, review, name='rate'):
                                     json=rating_json)
 
 
+
+@click.command()
+# @click.option('--veg', default=False, help='Order a vegetarian pizza')
+def show_menu(name='show-menu'):
+    print("Hello World! From inside show_menu!")
+
+
 cli.add_command(show_joints)
 cli.add_command(joint_info)
 cli.add_command(rate)
+cli.add_command(show_menu)
