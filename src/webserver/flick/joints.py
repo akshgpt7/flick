@@ -43,6 +43,20 @@ def ratings():
     return jsonify(ratings_json)
 
 
+@bp.route('/joints/<int:joint_id>/reviews')
+def reviews(joint_id):
+    db = get_db()
+    reviews = db.execute(
+        'SELECT review FROM reviews WHERE joint_id = ?', (joint_id,)
+    ).fetchall()
+
+    reviews_json = []
+    for r in reviews:
+        reviews_json.append(r[0])
+
+    return jsonify(reviews_json)
+
+
 @bp.route('/joints/<int:joint_id>')
 def joint(joint_id):
     db = get_db()
@@ -120,9 +134,8 @@ def rate(joint_id):
     if found:    
         json = request.get_json(force=True)
         rating = json['rating']
+        review = json['review']
         joint_id = json['joint_id']
-
-        error = None
 
         db.execute(
             'INSERT INTO ratings'
@@ -131,7 +144,14 @@ def rate(joint_id):
         )
         db.commit()
 
+        if review is not None:
+            db.execute(
+                'INSERT INTO reviews'
+                ' VALUES (?, ?)',
+                (joint_id, review)
+            )
+            db.commit()
+
     else:
         abort(404, "Joint id {0} doesn't exist.".format(joint_id))
-
 
