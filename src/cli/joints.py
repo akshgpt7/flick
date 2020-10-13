@@ -211,7 +211,6 @@ def rate(joint_id, rating, review, name='rate'):
             request = requests.post(server_url + f"/joints/{joint_id}/rate",
                                     json=rating_json)
 
-
 @click.command()
 @click.option('--veggie', is_flag=True, help='Order a vegetarian pizza')
 @click.argument('joint_id', type=int)
