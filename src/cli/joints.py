@@ -137,6 +137,8 @@ def rate(joint_id, rating, review, name='rate'):
 @click.argument('joint_id', type=int)
 def show_menu(joint_id, veggie):
     response = requests.get(server_url + f"/joints/{joint_id}/menu")
+    table = Texttable()
+    headings = [['Name', 'Toppings']]
 
     # Will be true when the user passes a pizza joint ID that doesn't exist
     if response.status_code == 404:
@@ -144,12 +146,22 @@ def show_menu(joint_id, veggie):
         exit(1)
 
     response_list = response.json()
+    table_rows = []
     for res in response_list:
         if veggie:
             if res['vegetarian']:
+                table_rows.append([res['name'], res['toppings']])
                 print(res)
+                print(res['name'])
+                print(res['toppings'])
         else:
+            table_rows.append([res['name'], res['toppings']])
             print(res)
+            print(res['name'])
+            print(res['toppings'])
+
+
+    click.echo('\n' + table.draw())
 
 
 
