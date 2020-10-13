@@ -1,3 +1,4 @@
+import random
 import click
 import requests
 from texttable import Texttable
@@ -68,8 +69,9 @@ def show_joints(location, min_rating, name='show-joints'):
 
 
 @click.command()
+@click.option('--reviews', is_flag=True)
 @click.argument('joint_id')
-def joint_info(joint_id, name='joint-info'):
+def joint_info(joint_id, reviews, name='joint-info'):
     response = requests.get(server_url + f"/joints/{joint_id}")
     if response.status_code == 404:
         click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
@@ -87,11 +89,28 @@ def joint_info(joint_id, name='joint-info'):
 
         click.echo(info)
 
+        if reviews:
+            click.echo("\t3 Random Reviews:")
+            response = requests.get(
+                server_url + f"/joints/{joint_id}/reviews")
+            review_list = response.json()
+
+            try:
+                review_numbers = random.sample(range(0, len(review_list)), 3)
+            except ValueError:
+                click.echo(f"\tOnly {len(review_list)} reviews for this joint.")
+                review_numbers = [n for n in range(len(review_list))]
+
+            for i in review_numbers:
+                click.echo("\t~  " + review_list[i])
+
+
 
 @click.command()
+@click.option('--review', type=str)
 @click.argument('joint_id')
 @click.argument('rating')
-def rate(joint_id, rating, name='rate'):
+def rate(joint_id, rating, review, name='rate'):
     response = requests.get(server_url + f"/joints/{joint_id}")
     if response.status_code == 404:
         click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
@@ -105,9 +124,12 @@ def rate(joint_id, rating, name='rate'):
                        )
         else:
             rating_json = {'joint_id': joint_id, 'rating': rating}
+            if review:
+                rating_json['review'] = review
+            else:
+                rating_json['review'] = None
             request = requests.post(server_url + f"/joints/{joint_id}/rate",
                                     json=rating_json)
-
 
 
 cli.add_command(show_joints)
