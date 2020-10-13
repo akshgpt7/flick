@@ -222,6 +222,10 @@ def rate(joint_id, rating, review, name='rate'):
                 rating_json['review'] = None
             request = requests.post(server_url + f"/joints/{joint_id}/rate",
                                     json=rating_json)
+            if request.ok:
+                click.echo('Review submitted - Thanks for your feedback!')
+            else:
+                click.echo('Uh-oh! Something went wrong, please try again.')
                                     
 
 cli.add_command(show_joints)
