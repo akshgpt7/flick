@@ -136,8 +136,6 @@ def rate(joint_id, rating, review, name='rate'):
 @click.option('--veggie', is_flag=True, help='Order a vegetarian pizza')
 @click.argument('joint_id', type=int)
 def show_menu(joint_id, veggie):
-    print("Hello World! From inside show_menu!")
-    print("This is the joint_id: {} and veggie option: {}".format(joint_id, veggie))
     response = requests.get(server_url + f"/joints/{joint_id}/menu")
     response_list = response.json()
     for res in response_list:
