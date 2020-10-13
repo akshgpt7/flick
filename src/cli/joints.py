@@ -235,7 +235,7 @@ def show_menu(joint_id, veggie, name='show-menu'):
     """Show menu items for joint specified"""
     response = requests.get(server_url + f"/joints/{joint_id}/menu")
     table = Texttable()
-    headings = [['Name', 'Toppings']]
+    headings = [['Name', 'Toppings', 'S', 'M', 'L']]
 
     # Will be true when the user passes a pizza joint ID that doesn't exist
     if response.status_code == 404:
@@ -245,11 +245,14 @@ def show_menu(joint_id, veggie, name='show-menu'):
     response_list = response.json()
     table_rows = []
     for res in response_list:
+        S = format(res['prices'][0].get('M'), '.2f')
+        M = format(res['prices'][0].get('M'), '.2f')
+        L = format(res['prices'][0].get('L'), '.2f')
         if veggie:
             if res['vegetarian']:
-                table_rows.append([res['name'], res['toppings']])
+                table_rows.append([res['name'], res['toppings'], S, M, L])
         else:
-            table_rows.append([res['name'], res['toppings']])
+            table_rows.append([res['name'], res['toppings'], S, M, L])
 
     table.add_rows(headings + table_rows)
     click.echo('\n' + table.draw())
