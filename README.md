@@ -2,8 +2,8 @@
 
 # flick
 
-**Time for some Pizza!**<br>
-`flick = flask + click`
+`flick = flask + click`<br>
+**Time for some Pizza!**
 
 ---
 
@@ -40,12 +40,12 @@ Now you can order a Pizza on the fly, directly through your command line using `
 - To activate a virtual environment for the project, run `pipenv shell`. After this, you'll be inside the virtual environment.
 - Install the dependencies by running `pipenv install`.
 
-#### Running the webserver
+### Running the webserver
 - cd into the webserver directory using `cd src/webserver`.
 - Run the command `flask run`.
 - The server will now be up and running.
 
-#### Setting up/Installing the CLI client
+### Setting up/Installing the CLI client
 ***Note: This can be done system wide (outside the pipenv) if you just want to use the client, but it's highly recommended to do it inside the virtual env for development.***
 - In a new terminal window, cd into the cli directory by `cd src/cli`.
 - Run the following command:
