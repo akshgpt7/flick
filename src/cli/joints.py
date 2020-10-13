@@ -245,9 +245,9 @@ def show_menu(joint_id, veggie, name='show-menu'):
     response_list = response.json()
     table_rows = []
     for res in response_list:
-        S = format(res['prices'][0].get('M'), '.2f')
-        M = format(res['prices'][0].get('M'), '.2f')
-        L = format(res['prices'][0].get('L'), '.2f')
+        S = '$' + format(res['prices'][0].get('M'), '.2f')
+        M = '$' + format(res['prices'][0].get('M'), '.2f')
+        L = '$' + format(res['prices'][0].get('L'), '.2f')
         if veggie:
             if res['vegetarian']:
                 table_rows.append([res['name'], res['toppings'], S, M, L])
