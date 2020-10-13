@@ -67,10 +67,49 @@ def show_joints(location, min_rating, name='show-joints'):
                    )
 
 
+@click.command()
+@click.argument('joint_id')
+def joint_info(joint_id, name='joint-info'):
+    response = requests.get(server_url + f"/joints/{joint_id}")
+    if response.status_code == 404:
+        click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
+                               bg='red', fg='white')
+                   )
+    else:
+        response_json = response.json()
+
+        info = f"""
+        {response_json['name']} (id: {joint_id})
+        {response_json['description']}
+        Location: {response_json['location']}
+        Rating: {round(response_json['rating'], 1)}
+        """
+
+        click.echo(info)
 
 
-
+@click.command()
+@click.argument('joint_id')
+@click.argument('rating')
+def rate(joint_id, rating, name='rate'):
+    response = requests.get(server_url + f"/joints/{joint_id}")
+    if response.status_code == 404:
+        click.echo(click.style(f'JOINT ID {joint_id} DOES NOT EXIST',
+                               bg='red', fg='white')
+                   )
+    else:
+        if int(rating) < 0 or int(rating) > 5:
+            click.echo(click.style(
+                f'Invalid Rating. Please choose a number between 0-5.',
+                fg='red')
+                       )
+        else:
+            rating_json = {'joint_id': joint_id, 'rating': rating}
+            request = requests.post(server_url + f"/joints/{joint_id}/rate",
+                                    json=rating_json)
 
 
 
 cli.add_command(show_joints)
+cli.add_command(joint_info)
+cli.add_command(rate)

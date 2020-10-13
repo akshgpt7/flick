@@ -46,35 +46,50 @@ def ratings():
 @bp.route('/joints/<int:joint_id>')
 def joint(joint_id):
     db = get_db()
-    joint = db.execute(
-        'SELECT j.joint_id, name, location, description, AVG(r.rating) '
-        ' FROM joints j JOIN ratings r ON j.joint_id = r.joint_id'
-        ' WHERE j.joint_id = ?',
-        (joint_id,)
-    ).fetchone()
 
-    if joint is None:
-        abort(404, "Joint id {0} doesn't exist.".format(joint_id))
-    else:
+    ids = db.execute('SELECT joint_id from joints').fetchall()
+    found = False
+    for id in ids:
+        if joint_id == id[0]:
+            found = True
+            break
+    
+    if found:
+        joint = db.execute(
+            'SELECT j.joint_id, name, location, description, AVG(r.rating) '
+            ' FROM joints j JOIN ratings r ON j.joint_id = r.joint_id'
+            ' WHERE j.joint_id = ?',
+            (joint_id,)
+        ).fetchone()
+
         joint_json = {'joint_id': joint[0], 'name': joint[1],
-                      'location': joint[2], 'description': joint[3],
-                      'rating': joint[4]
-                      }
+                    'location': joint[2], 'description': joint[3],
+                    'rating': joint[4] 
+                    }
+    
+        return jsonify(joint_json)
 
-    return jsonify(joint_json)
+    else:
+        abort(404, "Joint id {0} doesn't exist.".format(joint_id))
 
 
 @bp.route('/joints/<int:joint_id>/menu')
 def menu(joint_id):
     db = get_db()
-    pizzas = db.execute(
-        'SELECT pizza_id, name, toppings, vegetarian FROM pizzas WHERE joint_id = ?',
-        (joint_id,)
-    ).fetchall()
 
-    if not pizzas:
-        abort(404, "No pizzas found for this joint.")
-    else:
+    ids = db.execute('SELECT joint_id from joints').fetchall()
+    found = False
+    for id in ids:
+        if joint_id == id[0]:
+            found = True
+            break
+
+    if found:
+        pizzas = db.execute(
+            'SELECT pizza_id, name, toppings, vegetarian FROM pizzas WHERE joint_id = ?',
+            (joint_id,)
+        ).fetchall()
+
         pizzas_json = []
         for p in pizzas:
             pizzas_json.append(
@@ -85,23 +100,30 @@ def menu(joint_id):
                 }
             )
 
-    return jsonify(pizzas_json)
+        return jsonify(pizzas_json)
+
+    else:
+        abort(404, "Joint id {0} doesn't exist.".format(joint_id))
 
 
 @bp.route('/joints/<int:joint_id>/rate', methods=['POST'])
 def rate(joint_id):
-    # TODO: Change rating to user input from CLI
-    rating = 5
-    error = None
+    db = get_db()
 
-    # Checks that input is valid
-    if not (0 <= rating <= 5):
-        error = "Invalid rating."
+    ids = db.execute('SELECT joint_id from joints').fetchall()
+    found = False
+    for id in ids:
+        if joint_id == id[0]:
+            found = True
+            break
 
-    if error is not None:
-        # TODO: Display the error to the user
-        return error
-    else:
+    if found:    
+        json = request.get_json(force=True)
+        rating = json['rating']
+        joint_id = json['joint_id']
+
+        error = None
+
         db.execute(
             'INSERT INTO ratings'
             ' VALUES (?, ?)',
@@ -109,5 +131,7 @@ def rate(joint_id):
         )
         db.commit()
 
-    return redirect(url_for('joints.joint', joint_id=joint_id))
+    else:
+        abort(404, "Joint id {0} doesn't exist.".format(joint_id))
+
 
