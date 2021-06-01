@@ -211,7 +211,7 @@ def rate(joint_id, rating, review, name='rate'):
     else:
         if int(rating) < 0 or int(rating) > 5:
             click.echo(click.style(
-                f'Invalid Rating. Please choose a number between 0-5.',
+                'Invalid Rating. Please choose a number between 0-5.',
                 fg='red')
             )
         else:
