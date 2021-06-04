@@ -191,7 +191,7 @@ def joint_info(joint_id, reviews, name='joint-info'):
                 review_numbers = random.sample(range(0, len(review_list)), 3)
             except ValueError:
                 click.echo(f"\tOnly {len(review_list)} reviews for this joint.")
-                review_numbers = [n for n in range(len(review_list))]
+                review_numbers = list(range(len(review_list)))
 
             for i in review_numbers:
                 click.echo("\t~  " + review_list[i])
